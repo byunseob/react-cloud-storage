@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Suspense } from 'react';
+import {Switch, Route, withRouter} from "react-router-dom";
+import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
+import {routes} from "./routes";
+import MenuRoute from "./component/layout/MenuRoute";
+import {makeStyles} from "@material-ui/core";
+import Toast from "./component/Toast";
+
+const useStyles = makeStyles(theme => ({
+    root: {
+        display: 'flex',
+    },
+}));
 
 const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    const classes = useStyles();
 
-export default App;
+    return (
+        <div className={classes.root}>
+            <CssBaseline/>
+            {
+                routes.map((route, index) => (
+                    <MenuRoute
+                        key={`menu_route_${index}`}
+                        path={route.path}
+                        exact={route.exact}
+                        hasTop={route.hasTop}
+                    />
+                ))
+            }
+            <Suspense fallback={<div>Loading...</div>}>
+                <Switch>
+                    {
+                        routes.map((route, index) =>
+                            <Route
+                                key={index}
+                                path={route.path}
+                                exact={route.exact}
+                                component={route.component}
+                            />
+                        )
+                    }
+                </Switch>
+            </Suspense>
+            <Toast/>
+        </div>
+    );
+};
+
+export default withRouter(App);
